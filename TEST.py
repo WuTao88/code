@@ -13,23 +13,23 @@
 from shuizhun import *
 
 
-def ZD(bm=[],H=0.0,L=30.0,data=[],i=0,Hsx=None):
-    """_summary_
+def ZD(BM:list,H:float,L:float,data:list,i:int=0,Hsx:float=None):
+    """水准转点数据生成
 
     Args:
-        bm (list, optional):水准点 [zhunghao,'SZ01',564.3]
-        H (float, optional):与水准点高差 H=H水准点-H待测点
-        L (float, optional):与水准点的距离
-        data (list, optional): _description_. Defaults to [].
-        i (int, optional):转点编号 从默认0开始
-        Hsx (_type_, optional):视线高
+        BM (list):['SZ01',564.3]
+        H (float):与水准点高差 H=H水准点-H待测点
+        L (float):与水准点的距离
+        data (list): _description_. Defaults to [].
+        i (int):转点编号 从默认0开始
+        Hsx ():视线高
 
     Returns:
         返回下一次测点的视线高[]
     """
     
-    name=bm[1]
-    Hsz=bm[2]
+    name=BM[0]
+    Hsz=BM[1]
     hd=abs(H/L*30) 
     
     if i==0 and Hsx==None:
@@ -46,7 +46,7 @@ def ZD(bm=[],H=0.0,L=30.0,data=[],i=0,Hsx=None):
             hd=2.0
         if  abs(H)<4.1 and abs(L)<30:
             Hsx=round(Hsz+sz,3)
-            data.append([name,sz,'H:%s'%(Hsz),'',Hsx,'',Hsz,''])
+            data.append([name,sz,'视线高%s'%(round(Hsx,3)),'','','',Hsz,''])
             return (Hsx,dest,1)
         else:
             data.append([name,sz,'','','','',Hsz,''])
@@ -87,17 +87,11 @@ def ZD(bm=[],H=0.0,L=30.0,data=[],i=0,Hsx=None):
             i=i+1                           
     return (Hsx,dest,i+1)
 
-
-def newSZ(m,a,b):
-    h=0
-    for i in range(m):
-        pc=random.randint(a,b)
-        if True:
-            pass
-data=[]
-dd=ZD([123,'sz',67.86],6,5,data)
+if __name__=="__main__":
+    data=[]
+    dd=ZD(['sz',564.884],1.846,5,data)
 
 
-
-for d in data:
-    print(d)
+    print(dd)
+    for d in data:
+        print(d)
