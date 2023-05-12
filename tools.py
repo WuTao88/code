@@ -26,6 +26,13 @@ import win32api
 import pythoncom
 import time
 from natsort import natsorted
+
+
+def log(*msg):
+    f=open('日志.txt','a+',encoding='UTF-8')
+    f.write(f'{time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())}  :  {msg}\n')
+    f.close()
+    
 class Tool:
 
     def zhuanhuan(path,dest_path,*args):

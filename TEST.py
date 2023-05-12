@@ -11,87 +11,27 @@
 
 
 from shuizhun import *
+import openpyxl as xl
+import xlwings as xw
 
 
-def ZD(BM:list,H:float,L:float,data:list,i:int=0,Hsx:float=None):
-    """水准转点数据生成
 
-    Args:
-        BM (list):['SZ01',564.3]
-        H (float):与水准点高差 H=H水准点-H待测点
-        L (float):与水准点的距离
-        data (list): _description_. Defaults to [].
-        i (int):转点编号 从默认0开始
-        Hsx ():视线高
+def office(args,**kwargs):
 
-    Returns:
-        返回下一次测点的视线高[]
-    """
-    
-    name=BM[0]
-    Hsz=BM[1]
-    hd=abs(H/L*30) 
-    
-    if i==0 and Hsx==None:
-        if hd <4 and hd>3.5:
-            sz=round(random.uniform(hd+0.7,hd+1.0) if H<0 else random.uniform(0.7,1.0),3)
-            dest=round(random.uniform(hd+0.7,hd+1.0) if H>0 else random.uniform(0.7,1.0),3)
-        elif hd>=4:
-            hd=2.0
-            sz=round(random.uniform(hd+0.7,hd+1.0) if H<0 else random.uniform(0.7,1.0),3)
-            dest=round(random.uniform(hd+0.7,hd+1.0) if H>0 else random.uniform(0.7,1.0),3)         
-        else:
-            sz=round(random.uniform(hd+1.0,hd+1.6) if H<0 else random.uniform(1.0,1.6),3)
-            dest=round(random.uniform(hd+1.0,hd+1.6) if H>0 else random.uniform(1.0,1.6),3)
-            hd=2.0
-        if  abs(H)<4.1 and abs(L)<30:
-            Hsx=round(Hsz+sz,3)
-            data.append([name,sz,'视线高%s'%(round(Hsx,3)),'','','',Hsz,''])
-            return (Hsx,dest,1)
-        else:
-            data.append([name,sz,'','','','',Hsz,''])
-        Hsx=round(Hsz+sz,3)
-    else:
-        sz=0
-        dest=0
-        hd=2.0 if hd>4.0 else hd
-        
-    i=1 if i==0 else i
-    print(sz,dest)
-    while round(H+sz-dest,3)!=0:
-        hs=round(random.uniform(0.7+hd,1.0+hd) if H<0 else random.uniform(0.7,1.0),3)
-        qs=round(random.uniform(0.7,1.0) if H<0 else random.uniform(0.7+hd,1.0+hd),3)
-        if abs(round(H+sz-dest,3))<=hd and i>=int(L//30):
-            qs=round(hs+H+sz-dest,3)                
-            if qs<0.4:
-                qst=round(random.uniform(0.7,0.7+hd),3)
-                d=round(qst-qs,3)
-                hs=round(hs+d,3)
-                qs=qst
-            elif qs>4.8:
-                qst=round(random.uniform(4.5-hd,4.5),3)
-                d=round(qst-qs,3)
-                hs=round(hs+d,3)
-                qs=qst
-            Hsx=round(Hsx+hs-qs,3)
-            
-            data.append(['ZD%d'%i,'后视：%s'%(hs),'视线高：%s'%(Hsx),'前视：%s'%(qs),Hsx,'较水准点高差：','',''])
-            
-            break
-        else:
-            
-            data.append(['ZD%d'%i,'后视：%s'%(hs),'视线高：%s'%(round(Hsx-qs+hs,3)),'前视：%s'%(qs),'较水准点高差：','','',''])
-            Hsx=round(Hsx+hs-qs,3)
-            H=round(H+hs-qs,3)
-            
-            i=i+1                           
-    return (Hsx,dest,i+1)
+
+    pythoncom.CoInitialize()
+    app=xw.App(visible=False, add_book=False)
+    SP.writeGC(app,**kwargs)
+
+
+
 
 if __name__=="__main__":
     data=[]
-    dd=ZD(['sz',564.884],1.846,5,data)
-
-
+    dd=SP.ZD(['sz',564.884],85.846,5,data)
+    
+    DATA=data
+    path='C:\\Users\\Tao\\Desktop\\test'
+    kw={'path':path,'data':data,'zhuanghao':'33600-33760','gongxu':'边沟','gongcheng':'test','side':'右侧'}
+    office('None',**kw)
     print(dd)
-    for d in data:
-        print(d)

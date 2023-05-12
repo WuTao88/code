@@ -18,6 +18,7 @@ def source_path(relative_path):
 
 
 RES=source_path('res')
+muban=source_path('muban')
 
 
 
@@ -48,67 +49,25 @@ class SP:
         return ZH
 
 
+    def ZD(BM:list,H:float,L:float,data:list,i:int=0,Hsx:float=None):
+        """水准转点数据生成
 
-    def LMZD(bm=[],H=0.0,L=30.0,data=[],i=0,Hsx=None):
-        
-        name=bm[1]
-        Hsz=bm[2]
-        hd=abs(H/L*30)
-        if i==0 and Hsx==None:
-            if hd <4 and hd>3.5:
-                sz=round(random.uniform(hd+0.7,hd+1.0) if H<0 else random.uniform(0.7,1.0),3)
-                dest=round(random.uniform(hd+0.7,hd+1.0) if H>0 else random.uniform(0.7,1.0),3)
-            elif hd>=4:
-                hd=2.0
-                sz=round(random.uniform(hd+0.7,hd+1.0) if H<0 else random.uniform(0.7,1.0),3)
-                dest=round(random.uniform(hd+0.7,hd+1.0) if H>0 else random.uniform(0.7,1.0),3)         
-            else:
-                sz=round(random.uniform(hd+1.0,hd+1.6) if H<0 else random.uniform(1.0,1.6),3)
-                dest=round(random.uniform(hd+1.0,hd+1.6) if H>0 else random.uniform(1.0,1.6),3)
-                hd=2.0
-            if  abs(H)<4.1 and abs(L)<30:
-                Hsx=round(Hsz+sz,3)
-                data.append([name,'',sz,'','',Hsx,'',Hsz,'',''])
-                return (Hsx,dest,1)
-            else:
-                data.append([name,'',sz,'','','','',Hsz,'',''])
-            Hsx=round(Hsz+sz,3)
-        else:
-            sz=0
-            dest=0
-            hd=2.0 if hd>4.0 else hd
-                    
-        i=1 if i==0 else i
-        while round(H+sz-dest,3)!=0:
-            hs=round(random.uniform(0.7+hd,1.0+hd) if H<0 else random.uniform(0.7,1.0),3)
-            qs=round(random.uniform(0.7,1.0) if H<0 else random.uniform(0.7+hd,1.0+hd),3)
-            if abs(round(H+sz-dest,3))<=hd and i>=int(L//30):
-                qs=round(hs+H+sz-dest,3)
-                if qs<0.4:
-                    qst=round(random.uniform(0.7,0.7+hd),3)
-                    d=round(qst-qs,3)
-                    hs=round(hs+d,3)
-                    qs=qst
-                elif qs>4.8:
-                    qst=round(random.uniform(4.5-hd,4.5),3)
-                    d=round(qst-qs,3)
-                    hs=round(hs+d,3)
-                    qs=qst                    
-                Hsx=round(Hsx+hs-qs,3)
-                data.append(['ZD%d'%i,'',hs,'',qs,Hsx,'','','',''])
-                break
-            else:
-                data.append(['ZD%d'%i,'',hs,'',qs,'','','','',''])
-                Hsx=round(Hsx+hs-qs,3)
-                H=round(H+hs-qs,3)
-                i=i+1                           
-        return (Hsx,dest,i+1)
+        Args:
+            BM (list):['SZ01',564.3]
+            H (float):与水准点高差 H=H水准点-H待测点
+            L (float):与水准点的距离
+            data (list): _description_. Defaults to [].
+            i (int):转点编号 从默认0开始
+            Hsx ():视线高
 
-    def ZD(bm=[],H=0.0,L=30.0,data=[],i=0,Hsx=None):
+        Returns:
+            返回下一次测点的视线高[]
+        """
         
-        name=bm[1]
-        Hsz=bm[2]
+        name=BM[0]
+        Hsz=BM[1]
         hd=abs(H/L*30) 
+        
         if i==0 and Hsx==None:
             if hd <4 and hd>3.5:
                 sz=round(random.uniform(hd+0.7,hd+1.0) if H<0 else random.uniform(0.7,1.0),3)
@@ -123,10 +82,10 @@ class SP:
                 hd=2.0
             if  abs(H)<4.1 and abs(L)<30:
                 Hsx=round(Hsz+sz,3)
-                data.append([name,sz,'','',Hsx,'',Hsz,''])
+                data.append([name,sz,'视线高%s'%(round(Hsx,3)),'','','',Hsz,''])
                 return (Hsx,dest,1)
             else:
-                data.append([name,sz,'','','','',Hsz,''])
+                data.append([name,sz,'','',Hsz,'',''])
             Hsx=round(Hsz+sz,3)
         else:
             sz=0
@@ -134,6 +93,7 @@ class SP:
             hd=2.0 if hd>4.0 else hd
             
         i=1 if i==0 else i
+        print(sz,dest)
         while round(H+sz-dest,3)!=0:
             hs=round(random.uniform(0.7+hd,1.0+hd) if H<0 else random.uniform(0.7,1.0),3)
             qs=round(random.uniform(0.7,1.0) if H<0 else random.uniform(0.7+hd,1.0+hd),3)
@@ -150,12 +110,16 @@ class SP:
                     hs=round(hs+d,3)
                     qs=qst
                 Hsx=round(Hsx+hs-qs,3)
-                data.append(['ZD%d'%i,hs,'',qs,Hsx,'','',''])
+                
+                data.append(['ZD%d'%i,hs,'%s'%(Hsx),qs,Hsx,'',''])
+                
                 break
             else:
-                data.append(['ZD%d'%i,hs,'',qs,'','','',''])
+                
+                data.append(['ZD%d'%i,hs,'%s'%(round(Hsx-qs+hs,3)),qs,round(Hsx-qs+hs,3),'',''])
                 Hsx=round(Hsx+hs-qs,3)
                 H=round(H+hs-qs,3)
+                
                 i=i+1                           
         return (Hsx,dest,i+1)
 
@@ -281,28 +245,26 @@ class SP:
 
     def writeGC(app,**kwargs):
         DATA=kwargs['data']
-        wb=app.books.open(muban+'\\高程.xlsx')
+        wb=app.books.open(muban+'\\sample水准测量记录表.xlsx')
         sample=wb.sheets['sheet']
         i=1
-        for dt in DATA:
-            data=dt[0]
-            num=len(data)
-            pg=(num-1)//17
-            for p in range(0,pg+1):
-                sample.api.Copy(Before=sample.api)
-                sht = wb.sheets[f'sheet ({2})']
-                new_sheet_name = f'{kwargs["zhuanghao"][:8]}{kwargs["gongxu"][4:]}数据({i}.{p+1})'
-                sht.api.Name = new_sheet_name
-                sht=wb.sheets[sht.api.Name]
-                sht.range('A1').value=kwargs['project']
-                sht.range('B5').value=f"{kwargs['gongcheng']}"
-                sht.range('E5').value=f"{kwargs['zhuanghao']}{kwargs['gongxu']}"
-                w=p*17+17 if num>(p*17+17) else num
-                sht.range('A9').value=data[p*17:w]                
-                if p==pg:
-                    sht.range('B26').value=f"ΣH=H测-H设={dt[1][0]}-{dt[1][1]}={dt[1][2]}mm，符合精度要求"
-            i=i+1
-        wb.save(kwargs['path']+f"\\{kwargs['zhuanghao']}{kwargs['gongxu']}-"+'高程检测.xlsx')
+
+        data=DATA
+        num=len(data)
+        pg=(num-1)//13
+        for p in range(0,pg+1):
+            sample.api.Copy(Before=sample.api)
+            sht = wb.sheets[f'sheet ({2})']
+            new_sheet_name = f"{kwargs['zhuanghao']}数据({p+1})"
+            sht.api.Name = new_sheet_name
+            sht=wb.sheets[sht.api.Name]
+            # sht.range('A1').value=kwargs['project']
+            sht.range('B6').value=f"{kwargs['gongcheng']}"
+            sht.range('B7').value=f"{kwargs['zhuanghao']}{kwargs['gongxu']}"
+            w=p*13+13 if num>(p*13+13) else num
+            sht.range('A9').value=data[p*13:w]
+            p=p+1
+        wb.save(kwargs['path']+f"\\{kwargs['zhuanghao']}"+'高程检测.xlsx')
         wb.close()
 
 
@@ -330,140 +292,3 @@ class SP:
         wb.save(kwargs['path']+f"\\{kwargs['zhuanghao']}{kwargs['gongxu']}-"+'路基路面高程检测、计算.xlsx')
         wb.close()
 
-class OPTION:
-
-    def getBM(zh=0.0,filename=None):
-        global res
-
-        name=res+'\\BM' if filename ==None else filename
-        data=open(name, "r+",encoding='UTF-8')
-        gc={}
-        for sz in data:        
-            gc=eval(sz)
-        near=[abs(round(i-zh,3)) for i in gc.keys()]
-        key1=round(zh+min(near),3)
-        key2=round(zh-min(near),3)
-
-        if (key1) in gc:
-            return (key1,gc[key1][0],gc[key1][1])
-        else:
-            return (key2,gc[key2][0],gc[key2][1])
-
-
-    def getCtr(zh=0.0,filename=None):
-        global res
-        name=res+'\\ContralPoint' if filename ==None else filename
-        data=open(name, "r+",encoding='UTF-8')
-        KZD={}
-        for v in data:        
-            KZD=eval(v)
-        keys=list(KZD.keys())
-        near=[abs(round(i-zh,3)) for i in KZD.keys()]
-        key1=round(zh+min(near),3)
-        key2=round(zh-min(near),3)
-        a=None
-        dt=[]
-        if (key1) in KZD:
-            a=key1
-            dt.append(KZD[key1])
-        else:
-            a=key2
-            dt.append(KZD[key2])
-        if keys.index(a)+1 <len(keys):
-            dt.append(KZD[keys[keys.index(a)+1]])
-        else:
-            dt.append(KZD[keys[keys.index(a)-1]])
-        return dt
-
-
-def gaochengDeal(tree,PATH,**kwargs):
-
-    try:
-        app=xw.App(visible=False, add_book=False)
-        kwargs={k:kwargs[k].get() for k in kwargs}
-        ZH1=kwargs['zh1']
-        path=f"{PATH.get()}\\{kwargs['gongcheng']}\\{SP.mileageToStr(ZH1)}{ '-'+SP.mileageToStr(kwargs['zh2']) if 'zh2' in kwargs else ''}{kwargs['side'] if 'side' in kwargs else ''}{kwargs['gongxu']}"
-        if os.path.isdir(path):
-            pass
-        else:
-            os.makedirs(path)
-        kwargs['path']=path
-        kwargs['zhuanghao']=f"{SP.mileageToStr(ZH1)}{ '-'+SP.mileageToStr(kwargs['zh2']) if 'zh2' in kwargs else ''} {kwargs['side'] if 'side' in kwargs else ''}" if '回填' not in kwargs['gongxu'] else f"{SP.mileageToStr(ZH1)}{ '-'+SP.mileageToStr(kwargs['zh2']) if 'zh2' in kwargs else ''}"
-        DATA=[]
-        data=[]
-        BM=None
-        Hsx=None
-        dest=None
-        Hq=None
-        zhq=None
-        i=0
-        ZHS=tree.get_children()
-        for item in ZHS:
-            row=tree.item(item,'values')
-
-            zh=round(float(row[0]),3)
-            pianju=row[1]
-            HS=round(float(row[2]),3)
-            pc=random.randint(kwargs['pc_s'],kwargs['pc_b'])
-            if BM!=OPTION.getBM(zh):
-                if data !=[]:
-                    
-                    
-                    H=Hsx-BM[2]-dest
-                    L=BM[0]-zhq
-                    back=SP.ZD(BM,H,abs(L),data,i,Hsx) if abs(L)!=0 else SP.ZD(BM,H,abs(L+2),data,i,Hsx)
-                    Hsx=back[0]
-                    Ep=random.randint(-1*i,1*i)
-                    data.append([f'{BM[1]}','','',round(Hsx-BM[2],3),'',round(BM[2]+Ep/1000,3),BM[2],Ep])                        
-                    
-                    DATA.append([data,[round(BM[2]+Ep/1000,3),BM[2],Ep]])
-                    SP.writeGC(app,**kwargs)
-                    data=[]               
-                BM=OPTION.getBM(zh)                    
-                H=BM[2]-HS
-                L=abs(zh-BM[0])
-                Hsx=None
-                i=0
-                back=SP.ZD(BM,H,abs(L),data,i,Hsx)
-                Hsx=back[0]
-                i=back[2]
-                dest=back[1]
-                zhq=zh
-                Hq=HS 
-                data.append([f'{SP.mileageToStr(zh)},{pianju}','','',round(Hsx-round(HS+pc/1000,3),3),'',round(HS+pc/1000,3),HS,pc])
-            else:
-                HC=Hsx-HS            
-                L=zh-zhq
-                if HC<0.6 or HC>4.8:
-                    H=Hsx-HS-dest if HC> 4.8 else HC-2
-                    back=SP.ZD(BM,H,abs(L),data,i,Hsx) if abs(L)!=0 else SP.ZD(BM,H,abs(L+2),data,i,Hsx)
-                    log(back)
-                    Hsx=back[0]
-                    i=back[2]
-                    zhq=zh
-                    Hq=HS        
-                data.append([f'{SP.mileageToStr(zh)},{pianju}','','',round(Hsx-round(HS+pc/1000,3),3),'',round(HS+pc/1000,3),HS,pc])
-        
-        log(Hq,BM,zhq,i,dest)
-        
-        
-        H=Hsx-BM[2]-dest
-        L=BM[0]-zhq
-        back=SP.ZD(BM,H,abs(L),data,i,Hsx) if abs(L)!=0 else SP.ZD(BM,H,abs(L+2),data,i,Hsx)
-        Hsx=back[0]
-        if data!=[]:
-            
-            Ep=random.randint(-1*i,1*i)
-            data.append([f'{BM[1]}','','',round(Hsx-BM[2],3),'',round(BM[2]+Ep/1000,3),BM[2],Ep])         
-            DATA.append([data,[round(BM[2]+Ep/1000,3),BM[2],Ep]])
-        kwargs['data']=DATA
-        SP.writeGC(app,**kwargs)
-        
-    except Exception as err:
-        log('错误信息',f'发生错误,{err}，执行失败！！')
-    else:
-
-        log('信息', '成功')
-    finally:
-        app.quit()
-        
