@@ -48,6 +48,17 @@ class SP:
         ZH = "K{0}+{1}{2}{3:0>3.03f}".format(k, b, s, g + f)
         return ZH
 
+    def get_BM(zh:float,filename:str=f'{muban}\\水准控制点.xlsx'):
+        pythoncom.CoInitialize()
+        wb=xl.load_workbook(filename)
+        sheet=wb.worksheets[0]
+        BMS=[]
+        for row in list(sheet.rows)[1:]:            
+            BMS.append([col.value for col in row])
+        indexs=[abs(round(bm[0]-zh,3)) for bm in BMS]
+
+        return BMS[indexs.index(min(indexs))]
+        pass
 
     def ZD(BM:list,H:float,L:float,data:list,i:int=0,Hsx:float=None):
         """水准转点数据生成
@@ -66,21 +77,25 @@ class SP:
         
         name=BM[0]
         Hsz=BM[1]
-        hd=abs(H/L*30) 
+        n1=abs(round(H/3.5))+1
+        n2=abs(round(L/90))+1
+        hd=round(abs(H/n2),2) if (n2>n1  and n2>0)  else round(abs(H/n1),2)
+        print("HD::",hd)
         
-        if i==0 and Hsx==None:
-            if hd <4 and hd>3.5:
-                sz=round(random.uniform(hd+0.7,hd+1.0) if H<0 else random.uniform(0.7,1.0),3)
-                dest=round(random.uniform(hd+0.7,hd+1.0) if H>0 else random.uniform(0.7,1.0),3)
-            elif hd>=4:
-                hd=2.0
-                sz=round(random.uniform(hd+0.7,hd+1.0) if H<0 else random.uniform(0.7,1.0),3)
-                dest=round(random.uniform(hd+0.7,hd+1.0) if H>0 else random.uniform(0.7,1.0),3)         
+        if i==0 and Hsx==0.0:
+            if hd <4.5 and hd>2.5:
+                sz=round(random.uniform(hd+0.7,hd+1.0) if H<0 else random.uniform(0.5,0.8),3)
+                dest=round(random.uniform(hd+0.7,hd+1.0) if H>0 else random.uniform(0.5,0.8),3)
+            elif hd>=4.5:
+                hd=4.0
+                sz=round(random.uniform(hd+0.7,hd+1.0) if H<0 else random.uniform(0.5,0.8),3)
+                dest=round(random.uniform(hd+0.7,hd+1.0) if H>0 else random.uniform(0.5,0.8),3)        
             else:
-                sz=round(random.uniform(hd+1.0,hd+1.6) if H<0 else random.uniform(1.0,1.6),3)
-                dest=round(random.uniform(hd+1.0,hd+1.6) if H>0 else random.uniform(1.0,1.6),3)
+                sz=round(random.uniform(hd+0.7,hd+1.0) if H<0 else random.uniform(0.5,0.8),3)
+                dest=round(random.uniform(hd+0.7,hd+1.0) if H>0 else random.uniform(0.5,0.8),3)
                 hd=2.0
-            if  abs(H)<4.1 and abs(L)<30:
+            print("H=",H)
+            if  abs(H)<4.5 and abs(L)<30:
                 Hsx=round(Hsz+sz,3)
                 data.append([name,sz,'视线高%s'%(round(Hsx,3)),'','','',Hsz,''])
                 return (Hsx,dest,1)
@@ -90,15 +105,15 @@ class SP:
         else:
             sz=0
             dest=0
-            hd=2.0 if hd>4.0 else hd
+            hd=round(abs(H/n2),2) if (n2>n1  and n2>0)  else round(abs(H/n1),2)
             
         i=1 if i==0 else i
-        print(sz,dest)
+        print("HD::",hd)
         while round(H+sz-dest,3)!=0:
-            hs=round(random.uniform(0.7+hd,1.0+hd) if H<0 else random.uniform(0.7,1.0),3)
-            qs=round(random.uniform(0.7,1.0) if H<0 else random.uniform(0.7+hd,1.0+hd),3)
-            if abs(round(H+sz-dest,3))<=hd and i>=int(L//30):
-                qs=round(hs+H+sz-dest,3)                
+            hs=round(random.uniform(0.7+hd,1.0+hd) if H<0 else random.uniform(0.5,0.8),3)
+            qs=round(random.uniform(0.5,0.8) if H<0 else random.uniform(0.7+hd,1.0+hd),3)
+            if abs(round(H+sz-dest,3))<=hd and i>=int(L//90):
+                qs=round(hs+H+sz-dest,3)
                 if qs<0.4:
                     qst=round(random.uniform(0.7,0.7+hd),3)
                     d=round(qst-qs,3)
@@ -243,6 +258,8 @@ class SP:
         wb.save(kwargs['path']+f'\\{kwargs["zhuanghao"]}{kwargs["gongxu"]}-'+'平面位置检测.xlsx')
         wb.close()
 
+        """测量数据写入
+        """
     def writeGC(app,**kwargs):
         DATA=kwargs['data']
         wb=app.books.open(muban+'\\sample水准测量记录表.xlsx')
