@@ -24,15 +24,11 @@ class UI(QMainWindow):
         menubar = self.menuBar()
         mainMenu=menubar.addMenu('主菜单')
         homePage=QAction('主页',self)
-        
-        
+                
         水准=QAction('水准',self)
         mainMenu.addActions((homePage,水准))
         projectMenu=menubar.addMenu('项目管理')
         functionMenu=menubar.addMenu('功能')
-
-
-
 
         self.statusBar().showMessage('Ready')
 

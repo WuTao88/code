@@ -97,10 +97,10 @@ class SP:
             print("H=",H)
             if  abs(H)<4.5 and abs(L)<30:
                 Hsx=round(Hsz+sz,3)
-                data.append([name,sz,'视线高%s'%(round(Hsx,3)),'','','',Hsz,''])
+                data.append([name,'',sz,(round(Hsx,3)),'','','','','',''])
                 return (Hsx,dest,1)
             else:
-                data.append([name,sz,'','',Hsz,'',''])
+                data.append([name,'',sz,'','','','','','',''])
             Hsx=round(Hsz+sz,3)
         else:
             sz=0
@@ -126,12 +126,12 @@ class SP:
                     qs=qst
                 Hsx=round(Hsx+hs-qs,3)
                 
-                data.append(['ZD%d'%i,hs,'%s'%(Hsx),qs,Hsx,'',''])
+                data.append(['ZD%d'%i,'',hs,'%s'%(Hsx),qs,'','','','',''])
                 
                 break
             else:
                 
-                data.append(['ZD%d'%i,hs,'%s'%(round(Hsx-qs+hs,3)),qs,round(Hsx-qs+hs,3),'',''])
+                data.append(['ZD%d'%i,'',hs,'%s'%(round(Hsx-qs+hs,3)),qs,'','','','',''])
                 Hsx=round(Hsx+hs-qs,3)
                 H=round(H+hs-qs,3)
                 
@@ -260,29 +260,39 @@ class SP:
 
         """测量数据写入
         """
+    
     def writeGC(app,**kwargs):
-        DATA=kwargs['data']
-        wb=app.books.open(muban+'\\sample水准测量记录表.xlsx')
-        sample=wb.sheets['sheet']
-        i=1
+        try:
+            DATA=kwargs['data']
+            wb=app.books.open(muban+'\\test.xlsx')
+            sample=wb.sheets['sheet']
+            i=1
 
-        data=DATA
-        num=len(data)
-        pg=(num-1)//13
-        for p in range(0,pg+1):
-            sample.api.Copy(Before=sample.api)
-            sht = wb.sheets[f'sheet ({2})']
-            new_sheet_name = f"{kwargs['zhuanghao']}数据({p+1})"
-            sht.api.Name = new_sheet_name
-            sht=wb.sheets[sht.api.Name]
-            # sht.range('A1').value=kwargs['project']
-            sht.range('B6').value=f"{kwargs['gongcheng']}"
-            sht.range('B7').value=f"{kwargs['zhuanghao']}{kwargs['gongxu']}"
-            w=p*13+13 if num>(p*13+13) else num
-            sht.range('A9').value=data[p*13:w]
-            p=p+1
-        wb.save(kwargs['path']+f"\\{kwargs['zhuanghao']}"+'高程检测.xlsx')
-        wb.close()
+            data=DATA
+            num=len(data)
+            pg=(num-1)//13
+            for p in range(0,pg+1):
+                sample.api.Copy(Before=sample.api)
+                sht = wb.sheets[f'sheet ({2})']
+                new_sheet_name = f"{kwargs['gongcheng']}数据({p+1})"
+                sht.api.Name = new_sheet_name
+                sht=wb.sheets[sht.api.Name]
+                # sht.range('A1').value=kwargs['project']
+                sht.range('B6').value=f"{kwargs['gongcheng']}"
+                sht.range('B7').value=f"{kwargs['zhuanghao']}{kwargs['gongxu']}"
+                sht.range('H7').value="GE170-te"
+                sht.range('J7').value="666"
+                w=p*13+13 if num>(p*13+13) else num
+                print(data[p*13:w])
+                sht.range('A9').expand('table').value=data[p*13:w]
+                p=p+1
+            wb.save(kwargs['path']+f"\\{kwargs['zhuanghao']}({kwargs['NO']})"+'高程检测.xlsx')
+            wb.close()
+        except Exception as e:
+            print(e)
+
+        finally:
+            app.quit()
 
 
     def writeGCJS(app,**kwargs):

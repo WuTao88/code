@@ -45,7 +45,7 @@ def deal(zhung_Hs:list,path):
                 back=SP.ZD(BM,H2,L2,data,i,Hsx)
                 Hsx=back[0]
                 Ep=random.randint(-1*i,1*i)
-                data.append([f'{BM[0]}','','',round(Hsx-BM[1],3),'',round(BM[1]+Ep/1000,3),BM[1],Ep])
+                data.append([f'{BM[0]}','','','',round(Hsx-BM[1]-Ep/1000,3),round(BM[1]+Ep/1000,3),BM[1],'',Ep,'闭合'])
                 DATA.append(data)
                 data=[]
                 i=0
@@ -59,12 +59,13 @@ def deal(zhung_Hs:list,path):
             print(H,"<-H,L->",L)
             # print(BM)
             ce=SP.ZD(BM,H,L,data,i,Hsx)
+            Hsx=ce[0]
             Δh=random.randint(-30,30)
             print("Δh==",Δh)
-            data.append([SP.mileageToStr(zh),"","",round(Hsx-(Hd+Δh/1000),3),round(Hd+Δh/1000,3),Hd,Δh])        
+            data.append([SP.mileageToStr(zh),'','','',round(Hsx-(Hd+Δh/1000),3),round(Hd+Δh/1000,3),Hd,'',Δh,''])        
             dest=ce[1]
             i=ce[2]
-            Hsx=ce[0]
+            
             zh0=zh
         else:
 
@@ -75,13 +76,13 @@ def deal(zhung_Hs:list,path):
             Δh=random.randint(-30,30)
             if H>4.5 or H<0.5 or L>90:
                 ce=SP.ZD(BM,H,L,data,i,Hsx)
-                data.append([SP.mileageToStr(zh),"","",round(ce[0]-(Hd+Δh/1000),3),round(Hd+Δh/1000,3),Hd,Δh])
+                data.append([SP.mileageToStr(zh),'','','',round(ce[0]-(Hd+Δh/1000),3),round(Hd+Δh/1000,3),Hd,'',Δh,''])
                 dest=ce[1]
                 i=ce[2]
                 Hsx=ce[0]
                 zh0=zh
             else:
-                data.append([SP.mileageToStr(zh),"","",round(Hsx-(Hd+Δh/1000),3),round(Hd+Δh/1000,3),Hd,Δh])
+                data.append([SP.mileageToStr(zh),'','','',round(Hsx-(Hd+Δh/1000),3),round(Hd+Δh/1000,3),Hd,'',Δh,''])
                 zh0=zh
     H=Hsx-BM[1]-dest
     
@@ -91,13 +92,20 @@ def deal(zhung_Hs:list,path):
     print(L)
     if data!=[]:
         Ep=random.randint(-1*i,1*i)
-        data.append([f'{BM[0]}','','',round(Hsx-BM[1],3),'',round(BM[1]+Ep/1000,3),BM[1],Ep])
+        data.append([f'{BM[0]}','','','',round(Hsx-BM[1]-Ep/1000,3),round(BM[1]+Ep/1000,3),BM[1],'',Ep,'闭合'])
         DATA.append(data)
+    No=1
     for d in DATA:
         print(d)
+        for i in d:
+            print(len(i))
+            print(i)
+        kwargs={'data':d,'gongcheng':'路基工程','zhuanghao':'K25+000-K35+000','gongxu':'土方回填','path':path,'NO':No}
+        office(None,**kwargs)
         print("===============================")
+        No=No+1
 
 
 
 if __name__=="__main__":
-    deal([[27670,626.23],[27675,627.23],[27703,626.83],[29709,626.53]],'test')
+    deal([[27670,626.23],[27675,627.23],[27703,626.83],[29709,626.53]],'C:\\Users\\Tao\\Desktop\\test')
