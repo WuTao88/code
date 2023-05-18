@@ -38,6 +38,7 @@ class SP:
 
 
     def mileageToStr(km):
+
         if km==None:
             return ''
         k = int(km // 1000)
@@ -47,6 +48,13 @@ class SP:
         f = km - km // 1
         ZH = "K{0}+{1}{2}{3:0>3.03f}".format(k, b, s, g + f)
         return ZH
+    def pian(pianju:float):
+        if pianju>0:
+            return f'右{abs(pianju)}'
+        elif pianju<0:
+            return f'左{abs(pianju)}'
+        else:
+            return '中'
 
     def get_BM(zh:float,filename:str=f'{muban}\\水准控制点.xlsx'):
         pythoncom.CoInitialize()
@@ -279,14 +287,14 @@ class SP:
                 sht=wb.sheets[sht.api.Name]
                 # sht.range('A1').value=kwargs['project']
                 sht.range('B6').value=f"{kwargs['gongcheng']}"
-                sht.range('B7').value=f"{kwargs['zhuanghao']}{kwargs['gongxu']}"
-                sht.range('H7').value="GE170-te"
-                sht.range('J7').value="666"
+                sht.range('B7').value=f"{kwargs['ZHBW']}"
+                sht.range('H7').value=kwargs['BM'][0]
+                sht.range('J7').value=kwargs['BM'][1]
                 w=p*13+13 if num>(p*13+13) else num
                 print(data[p*13:w])
                 sht.range('A9').expand('table').value=data[p*13:w]
                 p=p+1
-            wb.save(kwargs['path']+f"\\{kwargs['zhuanghao']}({kwargs['NO']})"+'高程检测.xlsx')
+            wb.save(kwargs['path']+f"\\{kwargs['ZHBW']}({kwargs['NO']})"+'高程检测.xlsx')
             wb.close()
         except Exception as e:
             print(e)
